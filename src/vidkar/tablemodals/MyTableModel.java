@@ -22,6 +22,14 @@ public class MyTableModel extends AbstractTableModel {
 		        "Pool", new Integer(10), new Boolean(false)}
 		   };//same as before...
 
+	public Object[][] getData() {
+		return data;
+	}
+
+	public void setData(Object[][] data) {
+		this.data = data;
+	}
+
 	public int getColumnCount() {
 		return columnNames.length;
 	}
@@ -37,6 +45,13 @@ public class MyTableModel extends AbstractTableModel {
 	public Object getValueAt(int row, int col) {
 		return data[row][col];
 	}
+	
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+//		super.setValueAt(aValue, rowIndex, columnIndex);
+		data[rowIndex][columnIndex] = aValue;
+	}
 
 	public Class getColumnClass(int c) {
 		return getValueAt(0, c).getClass();
@@ -48,10 +63,15 @@ public class MyTableModel extends AbstractTableModel {
 	public boolean isCellEditable(int row, int col) {
 		// Note that the data/cell address is constant,
 		// no matter where the cell appears onscreen.
-		if (col < 2) {
-			return false;
-		} else {
-			return true;
-		}
+//		if (col < 2) {
+//			return false;
+//		} else {
+//			return true;
+//		}
+		return true;
+	}
+	
+	public void updateDataFromVidkar() {
+		
 	}
 }
