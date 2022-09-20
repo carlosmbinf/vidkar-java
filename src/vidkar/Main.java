@@ -21,9 +21,10 @@ import vidkar.tablemodals.*;
 public class Main extends JFrame {
 
 	private JPanel contentPane;
-	private JTable table;
+	public static JTable table;
 	private JScrollPane scroolPane;
-
+	public static MyTableModel tablemodal;
+	public static JButton btnNewButton = new JButton("Actualizar");
 	/**
 	 * Launch the application.
 	 */
@@ -33,6 +34,8 @@ public class Main extends JFrame {
 				try {
 					Main frame = new Main();
 					frame.setVisible(true);
+					HiloUpdateModal tread = new HiloUpdateModal();
+					tread.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -60,11 +63,11 @@ public class Main extends JFrame {
 
 		table.addMouseListener(new JTableButtonMouseListener(table));
 		table.setDefaultRenderer(JButton.class, new JTableButtonRenderer());
-		
+
 		table.setRowHeight(25);
 		table.setModel(new MyTableModel());
 //		table.getColumn("Button").setCellRenderer(buttonRenderer);
-		
+
 		scroolPane = new JScrollPane(table);
 		contentPane.add(scroolPane, BorderLayout.CENTER);
 
@@ -72,15 +75,43 @@ public class Main extends JFrame {
 		contentPane.add(panel, BorderLayout.NORTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnNewButton = new JButton("Actualizar");
+		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MyTableModel tablemodal = new MyTableModel();
-				tablemodal.updateDataFromVidkar();
-				table.setModel(tablemodal);
+				HiloUpdateModal thread = new HiloUpdateModal();
+				System.out.println("Actualizando Code");
+				thread.start();
 			}
 		});
 		panel.add(btnNewButton);
 	}
 
+}
+
+class HiloUpdateModal extends Thread {
+	public static void main(String[] args) {
+		HiloUpdateModal thread = new HiloUpdateModal();
+		System.out.println("Actualizando Code");
+		thread.start();
+
+	}
+
+	@SuppressWarnings("deprecation")
+	public void run() {
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		Main.btnNewButton.setEnabled(false);
+		Main.btnNewButton.setText("Cargando...");
+		Main.tablemodal = new MyTableModel();
+		Main.tablemodal.updateDataFromVidkar();
+		Main.table.setModel(Main.tablemodal);
+//		Main.table.getModel().updateDataFromVidkar();
+		System.out.println("Actualizacion Terminada");
+		Main.btnNewButton.setText("Actualizar");
+		Main.btnNewButton.setEnabled(true);
+	}
 }

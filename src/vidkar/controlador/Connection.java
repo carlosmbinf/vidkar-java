@@ -1,4 +1,4 @@
-package vidkar;
+package vidkar.controlador;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -50,13 +50,13 @@ public class Connection {
 
 			MongoCollection<Document> collection = database.getCollection("users");
 			Bson projectionFields = Projections.fields(
-//                    Projections.include("title", "imdb"),
+                    Projections.include("megasGastadosinBytes", "profile", "username", "vpnMbGastados", "movil")
 //                    Projections.excludeId()
 			);
 			MongoCursor<Document> cursor = collection.find(
 //            		lt("runtime", 15)
 			).projection(projectionFields)
-//                    .sort(Sorts.descending("title"))
+                    .sort(Sorts.descending("megasGastadosinBytes","vpnMbGastados"))
 					.iterator();
 			try {
 				while (cursor.hasNext()) {
@@ -70,6 +70,26 @@ public class Connection {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public Document findUserById(String id) {
+		try {
+
+			MongoCollection<Document> collection = database.getCollection("users");
+			Bson projectionFields = Projections.fields(
+                    Projections.include("megasGastadosinBytes", "profile", "username", "emails")
+//                    Projections.excludeId()
+			);
+			Document doc = collection.find(
+            		new Document("_id",id)
+			).projection(projectionFields)
+//                    .sort(Sorts.descending("megasGastadosinBytes"))
+					.first();
+			return doc;
+		} catch (Error e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void main(String[] args) {

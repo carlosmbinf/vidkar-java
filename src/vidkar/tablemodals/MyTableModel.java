@@ -13,15 +13,17 @@ import javax.swing.table.TableCellRenderer;
 
 import org.bson.Document;
 
-import vidkar.Connection;
 import vidkar.Main;
+import vidkar.controlador.Connection;
+import vidkar.vista.InfoUser;
 
 public class MyTableModel extends AbstractTableModel {
 	private Connection vidkarDB = new Connection();
-	private String[] columnNames = { "Nombre", "Apellido", "UserName", "Megas Gastados", "Button" };// same as before...
+	private String[] columnNames = { "Nombre", "Apellido", "UserName", "Movil", "Megas Gastados - Proxy",
+			"Megas Gastados - VPN", "Button" };// same as before...
 	@SuppressWarnings("removal")
 
-	private Object[][] data;
+	private Object[][] data = {};
 
 	public Object[][] getData() {
 		return data;
@@ -33,8 +35,8 @@ public class MyTableModel extends AbstractTableModel {
 
 	public MyTableModel() {
 		// TODO Auto-generated constructor stub
-		updateDataFromVidkar();
 	}
+
 	public int getColumnCount() {
 		return columnNames.length;
 	}
@@ -75,44 +77,48 @@ public class MyTableModel extends AbstractTableModel {
 //		}
 		return false;
 	}
-	
-	
 
-	
 	public void updateDataFromVidkar() {
 		LinkedList<Document> list = vidkarDB.findAllElement();
-		data = new Object[list.size()][5];
+		data = new Object[list.size()][7];
 		for (int i = 0; i < list.size(); i++) {
 			Document doc = list.get(i);
-			
+
 			try {
 				data[i][0] = ((Document) doc.get("profile")).get("firstName");
 				data[i][1] = ((Document) doc.get("profile")).get("lastName");
 				data[i][2] = doc.get("username");
-				data[i][3] = (doc.get("megasGastadosinBytes") == null || doc.get("megasGastadosinBytes") == "0"
+				data[i][3] = doc.get("movil") != null ? doc.get("movil") : "N/A";
+				data[i][4] = (doc.get("megasGastadosinBytes") == null || doc.get("megasGastadosinBytes") == "0"
 						|| doc.get("megasGastadosinBytes") == "") ? 0
 //								Long.parseLong(doc.get("megasGastadosinBytes").toString()) / 1024
 								: ((Float.parseFloat(doc.get("megasGastadosinBytes").toString()) / 1024000));
 //							doc.get("megasGastadosinBytes");	
+				data[i][5] = (doc.get("vpnMbGastados") == null || doc.get("vpnMbGastados") == "0"
+						|| doc.get("vpnMbGastados") == "") ? 0
+//								Long.parseLong(doc.get("megasGastadosinBytes").toString()) / 1024
+								: ((Float.parseFloat(doc.get("vpnMbGastados").toString()) / 1024000));
+//							doc.get("megasGastadosinBytes");
 				
-				////////CREANDO BOTON PARA VER AL USUARIO//////
-				JButton usuarioBtn = new JButton("Ver a " + doc.get("username"));
+				//////// CREANDO BOTON PARA VER AL USUARIO//////
+				JButton usuarioBtn = new JButton("Ver Detalles"
+//				+ doc.get("username")
+				);
 				usuarioBtn.setMargin(new Insets(10, 10, 10, 10));
 				usuarioBtn.addActionListener(new ActionListener() {
-					
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						// TODO Auto-generated method stub
-						System.out.println(doc.get("_id"));
-						JDialog diag = new JDialog();
-						diag.setSize(300, 300);
+						String id = doc.get("_id").toString();
+						InfoUser diag = new InfoUser(id);
 						diag.setLocationRelativeTo(null);
 						diag.setModal(true);
 						diag.show();
-						
+
 					}
 				});
-				data[i][4] = usuarioBtn;
+				data[i][6] = usuarioBtn;
 			} catch (NumberFormatException e) {
 				System.out.println(e);
 			}
