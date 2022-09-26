@@ -8,6 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -31,6 +33,21 @@ public class Main extends JFrame {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				try {
+			        for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+			            if ("Nimbus".equals(info.getName())) {
+			                UIManager.setLookAndFeel(info.getClassName());
+			                System.out.println("CHOSEN THIS");
+			                break;
+			            } else {
+			                UIManager.setLookAndFeel  ("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			            }
+			        }
+			    } catch (Exception e) {
+			        // If Nimbus is not available, you can set to another look and feel.
+			        // I can't get it to compile or work.
+			    }
+				
 				try {
 					Main frame = new Main();
 					frame.setVisible(true);

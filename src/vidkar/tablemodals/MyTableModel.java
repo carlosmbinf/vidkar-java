@@ -79,7 +79,7 @@ public class MyTableModel extends AbstractTableModel {
 	}
 
 	public void updateDataFromVidkar() {
-		LinkedList<Document> list = vidkarDB.findAllElement();
+		LinkedList<Document> list = vidkarDB.findAllUsers();
 		data = new Object[list.size()][7];
 		for (int i = 0; i < list.size(); i++) {
 			Document doc = list.get(i);

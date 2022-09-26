@@ -1,7 +1,5 @@
 package vidkar.controlador;
 
-import static com.mongodb.client.model.Filters.eq;
-
 import java.util.LinkedList;
 
 import org.bson.Document;
@@ -20,10 +18,10 @@ public class Connection {
 	MongoClient mongoClient = MongoClients.create(uri);
 	MongoDatabase database = mongoClient.getDatabase("meteor");
 
-	public Document findFirstElement() {
+	public Document findFirstElement(String collectionName) {
 
 		try {
-			MongoCollection<Document> collection = database.getCollection("users");
+			MongoCollection<Document> collection = database.getCollection(collectionName);
 			Bson projectionFields = Projections.fields(
 //					Projections.include("type", "version")
 //					, Projections.excludeId()
@@ -44,19 +42,19 @@ public class Connection {
 		return null;
 	}
 
-	public LinkedList<Document> findAllElement() {
+	public LinkedList<Document> findAllElement(String collectionName) {
 		LinkedList<Document> list = new LinkedList<Document>();
 		try {
 
-			MongoCollection<Document> collection = database.getCollection("users");
+			MongoCollection<Document> collection = database.getCollection(collectionName);
 			Bson projectionFields = Projections.fields(
-                    Projections.include("megasGastadosinBytes", "profile", "username", "vpnMbGastados", "movil")
+//                    Projections.include("megasGastadosinBytes", "profile", "username", "vpnMbGastados", "movil")
 //                    Projections.excludeId()
 			);
 			MongoCursor<Document> cursor = collection.find(
 //            		lt("runtime", 15)
 			).projection(projectionFields)
-                    .sort(Sorts.descending("megasGastadosinBytes","vpnMbGastados"))
+//                    .sort(Sorts.descending("megasGastadosinBytes","vpnMbGastados"))
 					.iterator();
 			try {
 				while (cursor.hasNext()) {
@@ -65,24 +63,69 @@ public class Connection {
 			} finally {
 				cursor.close();
 			}
-			
+
 		} catch (Error e) {
 			e.printStackTrace();
 		}
 		return list;
 	}
-	
+
+	public boolean findOnlineUser(String id) {
+
+		try {
+			MongoCollection<Document> collection = database.getCollection("online");
+			Bson projectionFields = Projections.fields(Projections.include("_id", "userId", "address")
+//					, Projections.excludeId()
+			);
+			Document doc = collection.find(new Document("userId", id)).projection(projectionFields)
+//					.sort(Sorts.descending("imdb.rating"))
+					.first();
+			if (doc == null) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Error e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public LinkedList<Document> findAllUsers() {
+		LinkedList<Document> list = new LinkedList<Document>();
+		try {
+
+			MongoCollection<Document> collection = database.getCollection("users");
+			Bson projectionFields = Projections
+					.fields(Projections.include("megasGastadosinBytes", "profile", "username", "vpnMbGastados", "movil")
+//                    Projections.excludeId()
+					);
+			MongoCursor<Document> cursor = collection.find(
+//            		lt("runtime", 15)
+			).projection(projectionFields).sort(Sorts.descending("megasGastadosinBytes", "vpnMbGastados")).iterator();
+			try {
+				while (cursor.hasNext()) {
+					list.add(cursor.next());
+				}
+			} finally {
+				cursor.close();
+			}
+
+		} catch (Error e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
 	public Document findUserById(String id) {
 		try {
 
 			MongoCollection<Document> collection = database.getCollection("users");
-			Bson projectionFields = Projections.fields(
-                    Projections.include("megasGastadosinBytes", "profile", "username", "emails")
+			Bson projectionFields = Projections
+					.fields(Projections.include("megasGastadosinBytes", "profile", "username", "emails")
 //                    Projections.excludeId()
-			);
-			Document doc = collection.find(
-            		new Document("_id",id)
-			).projection(projectionFields)
+					);
+			Document doc = collection.find(new Document("_id", id)).projection(projectionFields)
 //                    .sort(Sorts.descending("megasGastadosinBytes"))
 					.first();
 			return doc;
@@ -95,15 +138,28 @@ public class Connection {
 	public static void main(String[] args) {
 
 		Connection vidkarDB = new Connection();
-		Object result = vidkarDB.findFirstElement();
+		
+		//////BUSCA EL PRIMER ELEMENTO DE LA COLLECTION USERS
+		Object result = vidkarDB.findFirstElement("users");
 		if (result != null) {
 			System.out.println(((Document) result).toJson());
 		}
 
-		for (Document doc : vidkarDB.findAllElement()) {
+		/////BUSCA TODOS LOS USUARIOS
+		for (Document doc : vidkarDB.findAllUsers()) {
 			System.out.println(doc.toJson());
 		}
+
+		
+		////DICE SI ESTA ONLINE UN USUARIO BY ID
+		System.out.println(vidkarDB.findUserById("Pa4hQXHpZNKDjZKyy").get("username").toString() + " ONLINE: "
+				+ vidkarDB.findOnlineUser("Pa4hQXHpZNKDjZKyy"));
+		System.out.println(vidkarDB.findUserById("WwX53qa95tmhuJSrP").get("username").toString() + " ONLINE: "
+				+ vidkarDB.findOnlineUser("WwX53qa95tmhuJSrP"));
 //		vidkarDB.findAllElement().;
+		System.out.println(vidkarDB.findUserById("gaAunWWpBMfuCvhn4").get("username").toString() + " ONLINE: "
+				+ vidkarDB.findOnlineUser("gaAunWWpBMfuCvhn4"));
+
 	}
 
 }
