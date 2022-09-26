@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import vidkar.tablemodals.*;
+import javax.swing.JTextField;
 
 public class Main extends JFrame {
 
@@ -26,7 +27,10 @@ public class Main extends JFrame {
 	public static JTable table;
 	private JScrollPane scroolPane;
 	public static MyTableModel tablemodal;
-	public static JButton btnNewButton = new JButton("Actualizar");
+	private JPanel panel_1;
+	private JPanel panel_2;
+	public static JButton btnNewButton;
+	private JTextField textField;
 	/**
 	 * Launch the application.
 	 */
@@ -51,8 +55,8 @@ public class Main extends JFrame {
 				try {
 					Main frame = new Main();
 					frame.setVisible(true);
-					HiloUpdateModal tread = new HiloUpdateModal();
-					tread.start();
+//					HiloUpdateModal tread = new HiloUpdateModal();
+//					tread.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -90,17 +94,32 @@ public class Main extends JFrame {
 
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.NORTH);
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
+		panel.setLayout(new BorderLayout(0, 0));
 		
+		panel_1 = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) panel_1.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		panel.add(panel_1,BorderLayout.CENTER);
+		
+		btnNewButton = new JButton("Actualizar");
 		btnNewButton.addActionListener(new ActionListener() {
+			
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				HiloUpdateModal thread = new HiloUpdateModal();
-				System.out.println("Actualizando Code");
-				thread.start();
+				// TODO Auto-generated method stub
+				HiloUpdateModal hiloUpdate = new HiloUpdateModal();
+				hiloUpdate.start();
 			}
 		});
-		panel.add(btnNewButton);
+		panel_1.add(btnNewButton);
+		
+		panel_2 = new JPanel();
+		panel.add(panel_2,BorderLayout.EAST);
+		
+		textField = new JTextField();
+		textField.setToolTipText("Buscar Usuario");
+		panel_2.add(textField);
+		textField.setColumns(10);
 	}
 
 }
